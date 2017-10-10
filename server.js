@@ -3,7 +3,6 @@
 //----------------------//
 const server = require('express')()
 const bodyParser = require('body-parser');
-const moment = require('moment');
 const server_port = 4000;
 
 var count = 0;
@@ -41,7 +40,9 @@ server.post('/stg/', function (req, res) {
 server.post('/sdx/', function (req, res) {
 	
 	console.log("200 - Requisicao Recebida :" + req.originalUrl);
-	lastDateTimeReceived = moment().format("YYYY-MM-DDThh:mm:ss");
+	// lastDateTimeReceived = moment().format("YYYY-MM-DDThh:mm:ss");
+	// lastDateTimeReceived = moment();
+	lastDateTimeReceived = new Date(Date.now());
 	console.log(lastDateTimeReceived);
 	
 	if(count == 0){
@@ -69,7 +70,16 @@ server.get('/timelapse/', function (req, res) {
 	console.log("202 - Requisicao Recebida :" + req.originalUrl);
 	res.writeHead(202, { "Content-Type": "application/json" });
 	
-	res.end(lastDateTimeReceived);
+	var timeLapseObject = {
+		FirstStamp: firstDateTimeReceived ? firstDateTimeReceived : "0", 
+		LastStamp: lastDateTimeReceived ? lastDateTimeReceived : "0", 
+		Diff: null
+		}
+
+		var timeTemp = lastDateTimeReceived.getTime() - firstDateTimeReceived.getTime();
+		timeLapseObject.Diff = (timeTemp / 1000) + " milliseconds"; 
+
+	res.end(JSON.stringify(timeLapseObject));
 })
 
 ///
